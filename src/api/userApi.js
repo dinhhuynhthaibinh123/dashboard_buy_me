@@ -7,9 +7,17 @@ const userEndpoints = {
 };
 
 const userApi = {
-  getList: async () => {
+  getList: async (pagination, filters) => {
+    console.log(pagination);
+    console.log(filters);
     try {
-      const response = await privateClient.get(userEndpoints.list);
+      const response = await privateClient.get(userEndpoints.list, {
+        params: {
+          limit: pagination.limit,
+          page: pagination.page,
+          search: filters.search,
+        },
+      });
       return { response };
     } catch (err) {
       return { err };

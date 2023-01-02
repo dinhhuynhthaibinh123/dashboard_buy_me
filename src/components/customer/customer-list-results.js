@@ -15,52 +15,22 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { getInitials } from "../../utils/get-initials";
+import { getInitials, stringToColour } from "../../utils/get-initials";
+let bgColor = [
+  "#ab000d",
+  "#5c007a",
+  "#00227b",
+  "#00701a",
+  "#8c9900",
+  "#c68400",
+  "#40241a",
+  "#29434e",
+  "#ab000d",
+  "#5c007a",
+];
 
 export const CustomerListResults = ({ customers, ...rest }) => {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
-  const [limit, setLimit] = useState(10);
-  const [page, setPage] = useState(0);
-
-  const handleSelectAll = (event) => {
-    let newSelectedCustomerIds;
-
-    if (event.target.checked) {
-      newSelectedCustomerIds = customers.map((customer) => customer.id);
-    } else {
-      newSelectedCustomerIds = [];
-    }
-
-    setSelectedCustomerIds(newSelectedCustomerIds);
-  };
-
-  const handleSelectOne = (event, id) => {
-    const selectedIndex = selectedCustomerIds.indexOf(id);
-    let newSelectedCustomerIds = [];
-
-    if (selectedIndex === -1) {
-      newSelectedCustomerIds = newSelectedCustomerIds.concat(selectedCustomerIds, id);
-    } else if (selectedIndex === 0) {
-      newSelectedCustomerIds = newSelectedCustomerIds.concat(selectedCustomerIds.slice(1));
-    } else if (selectedIndex === selectedCustomerIds.length - 1) {
-      newSelectedCustomerIds = newSelectedCustomerIds.concat(selectedCustomerIds.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelectedCustomerIds = newSelectedCustomerIds.concat(
-        selectedCustomerIds.slice(0, selectedIndex),
-        selectedCustomerIds.slice(selectedIndex + 1)
-      );
-    }
-
-    setSelectedCustomerIds(newSelectedCustomerIds);
-  };
-
-  const handleLimitChange = (event) => {
-    setLimit(event.target.value);
-  };
-
-  const handlePageChange = (event, newPage) => {
-    setPage(newPage);
-  };
 
   return (
     <Card {...rest}>
@@ -69,26 +39,14 @@ export const CustomerListResults = ({ customers, ...rest }) => {
           <Table>
             <TableHead>
               <TableRow>
-                {/* <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedCustomerIds.length === customers.length}
-                    color="primary"
-                    indeterminate={
-                      selectedCustomerIds.length > 0
-                      && selectedCustomerIds.length < customers.length
-                    }
-                    onChange={handleSelectAll}
-                  />
-                </TableCell> */}
                 <TableCell>Name</TableCell>
                 <TableCell>Email</TableCell>
-                <TableCell>Location</TableCell>
                 <TableCell>Phone</TableCell>
                 <TableCell>Registration date</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {customers.slice(0, limit).map((customer) => (
+              {customers.map((customer) => (
                 <TableRow
                   hover
                   key={customer.id}
@@ -101,42 +59,58 @@ export const CustomerListResults = ({ customers, ...rest }) => {
                       value="true"
                     />
                   </TableCell> */}
-                  <TableCell>
+                  <TableCell
+                    sx={{
+                      width: 250,
+                    }}
+                  >
                     <Box
                       sx={{
                         alignItems: "center",
                         display: "flex",
                       }}
                     >
-                      <Avatar src={customer.avatarUrl} sx={{ mr: 2 }}>
-                        {getInitials(customer.name)}
+                      <Avatar
+                        style={{
+                          backgroundColor: bgColor[customers.indexOf(customer)],
+                        }}
+                        src={customer.avatar?.url}
+                        sx={{ mr: 2 }}
+                      >
+                        {getInitials(customer.first_name)}
                       </Avatar>
                       <Typography color="textPrimary" variant="body1">
-                        {customer.name}
+                        {customer.first_name}
                       </Typography>
                     </Box>
                   </TableCell>
-                  <TableCell>{customer.email}</TableCell>
-                  <TableCell>
-                    {`${customer.address.city}, ${customer.address.state}, ${customer.address.country}`}
+                  <TableCell
+                    sx={{
+                      width: 250,
+                    }}
+                  >
+                    {customer.email}
                   </TableCell>
-                  <TableCell>{customer.phone}</TableCell>
-                  <TableCell>{format(customer.createdAt, "dd/MM/yyyy")}</TableCell>
+                  <TableCell
+                    sx={{
+                      width: 250,
+                    }}
+                  >
+                    {customer.phone || "N/A"}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      width: 250,
+                    }}
+                  >
+                    {format(new Date(customer.created_at), "dd/MM/yyyy")}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </Box>
       </PerfectScrollbar>
-      <TablePagination
-        component="div"
-        count={customers.length}
-        onPageChange={handlePageChange}
-        onRowsPerPageChange={handleLimitChange}
-        page={page}
-        rowsPerPage={limit}
-        rowsPerPageOptions={[5, 10, 25]}
-      />
     </Card>
   );
 };
